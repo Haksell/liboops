@@ -221,4 +221,4 @@ def test_avl_multiset(repeats):
         data = list(avl)
         assert all(map(int.__le__, data, data[1:]))
         assert Counter(data) == cnt
-        assert len(data) == sum(cnt.values())
+        assert len(data) == len(avl) == sum(cnt.values())
