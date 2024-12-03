@@ -32,6 +32,10 @@ class AVL:
     def _get_size(node):
         return node.left_count + node.count + node.right_count if node else 0
 
+    @staticmethod
+    def _get_balance(node):
+        return AVL._get_height(node.left) - AVL._get_height(node.right) if node else 0
+
     def insert(self, key):
         self.root = self.__insert(self.root, key)
 
@@ -81,26 +85,23 @@ class AVL:
 
         return self.__update_and_balance(node)
 
-    def __get_balance(self, node):
-        return AVL._get_height(node.left) - AVL._get_height(node.right) if node else 0
-
     def __update_and_balance(self, node):
         node.update()
-        balance = self.__get_balance(node)
+        balance = AVL._get_balance(node)
 
         # Left Left Case
-        if balance > 1 and self.__get_balance(node.left) >= 0:
+        if balance > 1 and AVL._get_balance(node.left) >= 0:
             return self.__rotate_right(node)
         # Left Right Case
-        if balance > 1 and self.__get_balance(node.left) < 0:
+        if balance > 1 and AVL._get_balance(node.left) < 0:
             node.left = self.__rotate_left(node.left)
             return self.__rotate_right(node)
-        # Right Right Case
-        if balance < -1 and self.__get_balance(node.right) <= 0:
-            return self.__rotate_left(node)
         # Right Left Case
-        if balance < -1 and self.__get_balance(node.right) > 0:
+        if balance < -1 and AVL._get_balance(node.right) > 0:
             node.right = self.__rotate_right(node.right)
+            return self.__rotate_left(node)
+        # Right Right Case
+        if balance < -1 and AVL._get_balance(node.right) <= 0:
             return self.__rotate_left(node)
 
         return node
