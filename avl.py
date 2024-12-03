@@ -1,7 +1,7 @@
-# TODO: separate AVLMultiset, AVLSet and AVLMap
+# TODO: separate AVLMultiSet, AVLSet and AVLMap
 
 
-class AVL:
+class AVLMultiSet:
     class Node:
         def __init__(self, key):
             self.key = key
@@ -133,28 +133,26 @@ class AVL:
         elif node.right is None:
             return node.left
         else:
-            # find successor
-            tmp = node.right
-            while tmp.left is not None:
-                tmp = tmp.left
-            node.key = tmp.key
-            node.count = tmp.count
-            # TODO: no recursive call, just remember parent
-            tmp.count = 1  # reset tmp count to 1 to delete it ???
-            node.right = self.__delete(node.right, tmp.key)
+            successor = node.right
+            while successor.left is not None:
+                successor = successor.left
+            node.key = successor.key
+            node.count = successor.count
+            successor.count = 1  # reset successor count to 1 to delete it
+            node.right = self.__delete(node.right, successor.key)
         return node._update_and_balance()
 
 
 if __name__ == "__main__":
-    avl_tree = AVL()
+    avl = AVLMultiSet()
     data = [10, 20, 20, 30, 40, 50, 25, 20]
     for num in data:
-        avl_tree.insert(num)
+        avl.insert(num)
 
     print("Inorder traversal after insertions:")
-    print(avl_tree)
+    print(avl)
 
     for dk in [20, 30, 10, 20, 20]:
-        avl_tree.delete(dk)
+        avl.delete(dk)
         print(f"\nInorder traversal after deleting {dk}:")
-        print(avl_tree)
+        print(avl)
