@@ -19,14 +19,6 @@ class AVLMultiSet:
         def __len__(self):
             return self.left_len + self.count + self.right_len
 
-        def __contains__(self, key):
-            if key < self.key:
-                return key in self.left if self.left else False
-            elif key > self.key:
-                return key in self.right if self.right else False
-            else:
-                return True
-
         def __iter__(self):
             if self.left:
                 yield from self.left
@@ -34,6 +26,9 @@ class AVLMultiSet:
                 yield self.key
             if self.right:
                 yield from self.right
+
+        def __contains__(self, key):
+            return self._count(key) >= 1
 
         @property
         def left_height(self):
@@ -81,6 +76,14 @@ class AVLMultiSet:
             self._update()
             parent._update()
             return parent
+
+        def _count(self, key):
+            if key < self.key:
+                return self.left._count(key) if self.left else 0
+            elif key > self.key:
+                return self.right._count(key) if self.right else 0
+            else:
+                return self.count
 
     def __init__(self):
         self.root = None
@@ -160,6 +163,9 @@ class AVLMultiSet:
             node.right = self.__delete(node.right, successor.key)
         return node._update_and_balance()
 
+    def count(self, key):
+        return self.root._count(key) if self.root else 0
+
 
 @pytest.mark.parametrize("repeats", range(100))
 def test_avl_multiset(repeats):
@@ -212,6 +218,7 @@ def test_avl_multiset(repeats):
         assert matches(avl.root, cnt)
         for i in range(lo, hi + 1):
             assert (i in avl) == (i in cnt)
+            assert avl.count(i) == cnt[i]
         data = list(avl)
         assert all(map(int.__le__, data, data[1:]))
         assert Counter(data) == cnt
