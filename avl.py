@@ -27,6 +27,13 @@ class AVLMultiSet:
             if self.right:
                 yield from self.right
 
+        def unique(self):
+            if self.left:
+                yield from self.left.unique()
+            yield self.key
+            if self.right:
+                yield from self.right.unique()
+
         def __contains__(self, key):
             return self._count(key) >= 1
 
@@ -110,6 +117,11 @@ class AVLMultiSet:
             return
         yield from self.root
 
+    def unique(self):
+        if self.root is None:
+            return
+        yield from self.root.unique()
+
     def __getitem__(self, idx):
         if idx >= len(self) or idx < -len(self):
             raise IndexError(f"{self.__class__.__name__} index out of range")
@@ -179,6 +191,17 @@ class AVLMultiSet:
     def count(self, key):
         return self.root._count(key) if self.root else 0
 
+    def smaller_than(self, key):
+        res = 0
+        node = self.root
+        while node:
+            if node.key >= key:
+                node = node.left
+            else:
+                res += node.count + node.left_len
+                node = node.right
+        return res
+
 
 @pytest.mark.parametrize("repeats", range(100))
 def test_avl_multiset(repeats):
@@ -236,6 +259,9 @@ def test_avl_multiset(repeats):
         assert all(map(int.__le__, data, data[1:]))
         assert Counter(data) == cnt
         assert len(data) == len(avl) == sum(cnt.values())
+        assert list(avl.unique()) == sorted(set(data))
         for i in range(len(avl)):
             assert avl[i] == data[i]
             assert avl[~i] == data[~i]
+        cmp_key = random.randint(lo, hi)
+        assert avl.smaller_than(cmp_key) == sum(x < cmp_key for x in data)
