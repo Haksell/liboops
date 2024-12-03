@@ -30,14 +30,6 @@ class AVLMultiSet:
         def __contains__(self, key):
             return self._count(key) >= 1
 
-        def __getitem__(self, idx):
-            if idx < self.left_len:
-                return self.left[idx]
-            elif idx < self.left_len + self.count:
-                return self.key
-            else:
-                return self.right[idx - self.left_len - self.count]
-
         @property
         def left_height(self):
             return self.left.height if self.left else 0
@@ -93,6 +85,22 @@ class AVLMultiSet:
             else:
                 return self.count
 
+        def _get(self, idx):
+            if idx < self.left_len:
+                return self.left._get(idx)
+            elif idx < self.left_len + self.count:
+                return self.key
+            else:
+                return self.right._get(idx - self.left_len - self.count)
+
+        def _get_slice(self, start, end):
+            if idx < self.left_len:
+                return self.left._get(idx)
+            elif idx < self.left_len + self.count:
+                return self.key
+            else:
+                return self.right._get(idx - self.left_len - self.count)
+
     def __init__(self):
         self.root = None
 
@@ -111,9 +119,29 @@ class AVLMultiSet:
         yield from self.root
 
     def __getitem__(self, idx):
-        if idx >= len(self) or idx < -len(self):
-            raise IndexError(f"{self.__class__.__name__} index out of range")
-        return self.root[idx] if idx >= 0 else self.root[idx + len(self.root)]
+        if isinstance(idx, slice):
+            if idx.step == 0:
+                raise ValueError("slice step cannot be zero")
+            step, reverse = (
+                (1, False)
+                if idx.step is None
+                else (idx.step, False)
+                if idx.step > 0
+                else (-idx.step, True)
+            )
+            start = 0
+            if idx.start is None:
+                idx.start = 0 if idx.step >= 1 else len(self.root) - 1
+            elif idx.start < 0:
+                idx.start += len(self.root)
+            if idx.stop is None:
+                idx.stop = len(self.root) - 1 if idx.step >= 1 else 0
+            elif idx.stop < 0:
+                idx.stop += len(self.root)
+        else:
+            if idx >= len(self) or idx < -len(self):
+                raise IndexError(f"{self.__class__.__name__} index out of range")
+            return self.root[idx] if idx >= 0 else self.root[idx + len(self.root)]
 
     def __repr__(self):
         def inorder(node, depth):

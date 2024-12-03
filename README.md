@@ -1,0 +1,26 @@
+# TODO
+
+- [ ] SegmentTree with func argument
+- [ ] `@abc AVL`, with `AVLMultiSet`, `AvlSet`, `AvlDict`
+- [ ] Wrapper around `heapq` to work as a max-heap
+- [ ] Wrappers around `set`, `dict`, `defaultdict` and `Counter` to avoid hash collisions
+- [ ] Trie
+- [ ] Suffix Array / Suffix Tree
+- [ ] FenwickTree (2D Fenwick Tree, Fenwick Tree with Range Updates and Point Queries, Fenwick Tree of Fenwick Trees???)
+- [ ] Persistent segment tree
+- [ ] Persistent union find
+- [ ] Segment tree with lazy propagation
+- [ ] Dynamic Range Minimum Query (RMQ)
+- [ ] Treap
+- [ ] Heavy-Light Decomposition (HLD)
+- [ ] K-D Tree
+- [ ] Dynamic Connectivity (Euler Tour Tree, Link-Cut Tree)
+- [ ] Planarity Testing (for planar graphs)
+- [ ] Graph Centroid Decomposition (optimal for divide-and-conquer strategies)
+- [ ] Wavelet Tree
+- [ ] Fast Fourier Transform
+- [ ] Number Theoretic Transform (NTT) for modular arithmetic
+- [ ] https://github.com/kth-competitive-programming/kactl
+- [ ] https://github.com/TheAlgorithms/Python
+- [ ] https://github.com/cheran-senthil/PyRival
+- [ ] whatever is needed to solve codeforces problems
