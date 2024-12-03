@@ -30,6 +30,25 @@ class AVLMultiSet:
         def __contains__(self, key):
             return self._count(key) >= 1
 
+        def __getitem__(self, idx):
+            return self._getitem_left(idx) if idx >= 0 else self._getitem_right(~idx)
+
+        def _getitem_left(self, idx):
+            if idx < self.left_len:
+                return self.left._getitem_left(idx)
+            elif idx < self.left_len + self.count:
+                return self.key
+            else:
+                return self.right._getitem_left(idx - self.left_len - self.count)
+
+        def _getitem_right(self, idx):
+            if idx < self.right_len:
+                return self.right._getitem_right(idx)
+            elif idx < self.right_len + self.count:
+                return self.key
+            else:
+                return self.left._getitem_right(idx - self.right_len - self.count)
+
         @property
         def left_height(self):
             return self.left.height if self.left else 0
@@ -101,6 +120,11 @@ class AVLMultiSet:
         if self.root is None:
             return
         yield from self.root
+
+    def __getitem__(self, idx):
+        if idx >= len(self) or idx < -len(self):
+            raise IndexError(f"{self.__class__.__name__} index out of range")
+        return self.root[idx]
 
     def __repr__(self):
         def inorder(node, depth):
@@ -223,3 +247,6 @@ def test_avl_multiset(repeats):
         assert all(map(int.__le__, data, data[1:]))
         assert Counter(data) == cnt
         assert len(data) == len(avl) == sum(cnt.values())
+        for i in range(len(avl)):
+            assert avl[i] == data[i]
+            assert avl[~i] == data[~i]
