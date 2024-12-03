@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class UnionFind:
     def __init__(self, n):
         self.__len = n
@@ -6,6 +9,15 @@ class UnionFind:
 
     def __len__(self):
         return self.__len
+
+    def __repr__(self):
+        components = (
+            str(list(self.components()))
+            .replace(",", "")
+            .replace("[", "{")
+            .replace("]", "}")
+        )[1:-1]
+        return f"{self.__class__.__name__}({components})"
 
     def find(self, u):
         while u != self.__parents[u]:
@@ -25,3 +37,12 @@ class UnionFind:
             self.__parents[root_u] = root_v
             self.__ranks[root_v] += 1
         return False
+
+    def connected(self, u, v):
+        return self.find(u) == self.find(v)
+
+    def components(self):
+        components = defaultdict(list)
+        for i in range(self.__len):
+            components[self.find(i)].append(i)
+        yield from components.values()
