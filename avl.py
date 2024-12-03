@@ -2,6 +2,9 @@
 
 
 from collections import Counter
+from math import inf as INF
+import pytest
+import random
 
 
 class AVLMultiSet:
@@ -23,6 +26,14 @@ class AVLMultiSet:
                 return key in self.right if self.right else False
             else:
                 return True
+
+        def __iter__(self):
+            if self.left:
+                yield from self.left
+            for _ in range(self.count):
+                yield self.key
+            if self.right:
+                yield from self.right
 
         @property
         def left_height(self):
@@ -84,11 +95,19 @@ class AVLMultiSet:
     def __init__(self):
         self.root = None
 
+    def __bool__(self):
+        return self.root is not None
+
     def __len__(self):
         return len(self.root) if self.root else 0
 
     def __contains__(self, key):
         return key in self.root if self.root else False
+
+    def __iter__(self):
+        if self.root is None:
+            return
+        yield from self.root
 
     def __repr__(self):
         def inorder(node, depth):
@@ -152,128 +171,54 @@ class AVLMultiSet:
         return node._update_and_balance()
 
 
-def test_avl_insert():
+@pytest.mark.parametrize("repeats", range(100))
+def test_avl_multiset(repeats):
+    def is_sorted(avl, lo=-INF, hi=INF):
+        return avl is None or (
+            avl.key > lo
+            and avl.key < hi
+            and is_sorted(avl.left, lo, avl.key)
+            and is_sorted(avl.right, avl.key, hi)
+        )
+
+    def is_balanced(avl):
+        return avl is None or (
+            -1 <= avl.balance <= 1 and is_balanced(avl.left) and is_balanced(avl.right)
+        )
+
+    def matches(avl, true_cnt):
+        def fill(node):
+            if node is None:
+                return
+            fill(node.left)
+            avl_cnt[node.key] = node.count
+            fill(node.right)
+
+        avl_cnt = Counter()
+        fill(avl)
+        return avl_cnt == true_cnt
+
+    lo, hi = sorted(random.choices(range(-100, 101), k=2))
+    cnt = Counter()
     avl = AVLMultiSet()
-    keys = [10, 20, 30, 40, 50, 25]
-    for key in keys:
-        avl.insert(key)
-    assert len(avl) == len(keys)
-    # Test the balance of the tree
-    assert avl.root.balance in [-1, 0, 1]
-
-
-def test_avl_delete_leaf():
-    avl = AVLMultiSet()
-    keys = [20, 10, 30]
-    for key in keys:
-        avl.insert(key)
-    avl.delete(10)
-    assert len(avl) == 2
-    assert avl.root.left is None
-
-
-def test_avl_delete_node_with_one_child():
-    avl = AVLMultiSet()
-    keys = [20, 10, 30, 25]
-    for key in keys:
-        avl.insert(key)
-    avl.delete(30)
-    assert len(avl) == 3
-    assert avl.root.right.key == 25
-
-
-def test_avl_delete_node_with_two_children():
-    avl = AVLMultiSet()
-    keys = [50, 30, 70, 20, 40, 60, 80]
-    for key in keys:
-        avl.insert(key)
-    avl.delete(50)
-    assert len(avl) == 6
-    assert avl.root.key != 50
-    # Ensure the tree is balanced
-    assert avl.root.balance in [-1, 0, 1]
-
-
-def test_avl_duplicate_keys():
-    avl = AVLMultiSet()
-    keys = [10, 20, 20, 30, 30, 30]
-    for key in keys:
-        avl.insert(key)
-    assert len(avl) == len(keys)
-    avl.delete(20)
-    assert len(avl) == 5
-    avl.delete(20)
-    assert len(avl) == 4
-    # Deleting 20 again should remove it completely
-    avl.delete(20)
-    assert len(avl) == 4  # No change, 20 was already removed
-
-
-def test_avl_height():
-    avl = AVLMultiSet()
-    keys = [10, 20, 30, 40, 50, 25]
-    for key in keys:
-        avl.insert(key)
-    # For an AVL tree, the height should be minimal (logarithmic)
-    assert avl.root.height == 3
-
-
-def test_avl_left_right_rotations():
-    avl = AVLMultiSet()
-    avl.insert(30)
-    avl.insert(20)
-    avl.insert(10)  # Should cause a right rotation
-    assert avl.root.key == 20
-    avl = AVLMultiSet()
-    avl.insert(10)
-    avl.insert(20)
-    avl.insert(30)  # Should cause a left rotation
-    assert avl.root.key == 20
-
-
-def test_avl_complex_operations():
-    avl = AVLMultiSet()
-    operations = [
-        ("insert", 10),
-        ("insert", 20),
-        ("insert", 30),
-        ("delete", 20),
-        ("insert", 25),
-        ("insert", 5),
-        ("delete", 10),
-        ("insert", 15),
-    ]
-    for op, key in operations:
-        if op == "insert":
-            avl.insert(key)
-        elif op == "delete":
-            avl.delete(key)
-    assert len(avl) == 4
-    # Ensure the tree is balanced after complex operations
-    assert avl.root.balance in [-1, 0, 1]
-
-
-def test_avl_multiset():
     for _ in range(100):
-        keys = []
-        cnt = Counter()
-        avl = AVLMultiSet()
-        # for _ in range(100):
-        #     if
-
-
-if __name__ == "__main__":
-    avl = AVLMultiSet()
-    print(bool(avl))
-    data = [10, 20, 20, 30, 40, 50, 25, 20]
-    for num in data:
-        avl.insert(num)
-    print(bool(avl))
-
-    print("Inorder traversal after insertions:")
-    print(avl)
-
-    for dk in [20, 30, 10, 20, 20]:
-        avl.delete(dk)
-        print(f"\nInorder traversal after deleting {dk}:")
-        print(avl)
+        if cnt and random.random() < 0.4:
+            key = random.choice(list(cnt.keys()))
+            avl.delete(key)
+            if cnt[key] == 1:
+                del cnt[key]
+            else:
+                cnt[key] -= 1
+        else:
+            key = random.randint(lo, hi)
+            avl.insert(key)
+            cnt[key] += 1
+        assert is_sorted(avl.root)
+        assert is_balanced(avl.root)
+        assert matches(avl.root, cnt)
+        for i in range(lo, hi + 1):
+            assert (i in avl) == (i in cnt)
+        data = list(avl)
+        assert all(map(int.__le__, data, data[1:]))
+        assert Counter(data) == cnt
+        assert len(data) == sum(cnt.values())
