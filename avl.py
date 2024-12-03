@@ -143,6 +143,107 @@ class AVLMultiSet:
         return node._update_and_balance()
 
 
+def test_avl_insert():
+    avl = AVLMultiSet()
+    keys = [10, 20, 30, 40, 50, 25]
+    for key in keys:
+        avl.insert(key)
+    assert len(avl) == len(keys)
+    # Test the balance of the tree
+    assert avl.root.balance in [-1, 0, 1]
+
+
+def test_avl_delete_leaf():
+    avl = AVLMultiSet()
+    keys = [20, 10, 30]
+    for key in keys:
+        avl.insert(key)
+    avl.delete(10)
+    assert len(avl) == 2
+    assert avl.root.left is None
+
+
+def test_avl_delete_node_with_one_child():
+    avl = AVLMultiSet()
+    keys = [20, 10, 30, 25]
+    for key in keys:
+        avl.insert(key)
+    avl.delete(30)
+    assert len(avl) == 3
+    assert avl.root.right.key == 25
+
+
+def test_avl_delete_node_with_two_children():
+    avl = AVLMultiSet()
+    keys = [50, 30, 70, 20, 40, 60, 80]
+    for key in keys:
+        avl.insert(key)
+    avl.delete(50)
+    assert len(avl) == 6
+    assert avl.root.key != 50
+    # Ensure the tree is balanced
+    assert avl.root.balance in [-1, 0, 1]
+
+
+def test_avl_duplicate_keys():
+    avl = AVLMultiSet()
+    keys = [10, 20, 20, 30, 30, 30]
+    for key in keys:
+        avl.insert(key)
+    assert len(avl) == len(keys)
+    avl.delete(20)
+    assert len(avl) == 5
+    avl.delete(20)
+    assert len(avl) == 4
+    # Deleting 20 again should remove it completely
+    avl.delete(20)
+    assert len(avl) == 4  # No change, 20 was already removed
+
+
+def test_avl_height():
+    avl = AVLMultiSet()
+    keys = [10, 20, 30, 40, 50, 25]
+    for key in keys:
+        avl.insert(key)
+    # For an AVL tree, the height should be minimal (logarithmic)
+    assert avl.root.height == 3
+
+
+def test_avl_left_right_rotations():
+    avl = AVLMultiSet()
+    avl.insert(30)
+    avl.insert(20)
+    avl.insert(10)  # Should cause a right rotation
+    assert avl.root.key == 20
+    avl = AVLMultiSet()
+    avl.insert(10)
+    avl.insert(20)
+    avl.insert(30)  # Should cause a left rotation
+    assert avl.root.key == 20
+
+
+def test_avl_complex_operations():
+    avl = AVLMultiSet()
+    operations = [
+        ("insert", 10),
+        ("insert", 20),
+        ("insert", 30),
+        ("delete", 20),
+        ("insert", 25),
+        ("insert", 5),
+        ("delete", 10),
+        ("insert", 15),
+    ]
+    for op, key in operations:
+        if op == "insert":
+            avl.insert(key)
+        elif op == "delete":
+            avl.delete(key)
+    assert len(avl) == 4
+    # Ensure the tree is balanced after complex operations
+    assert avl.root.balance in [-1, 0, 1]
+
+
 if __name__ == "__main__":
     avl = AVLMultiSet()
     data = [10, 20, 20, 30, 40, 50, 25, 20]
