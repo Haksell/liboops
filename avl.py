@@ -18,21 +18,13 @@ class AVL:
         def size(self):
             return self.left_size + self.count + self.right_size
 
-        @staticmethod
-        def _get_size(node):
-            return node.size if node else 0
-
         @property
         def balance(self):
             return AVL.Node._get_height(self.left) - AVL.Node._get_height(self.right)
 
-        @staticmethod
-        def _get_balance(node):
-            return node.balance if node else 0
-
         def _update(self):
-            self.left_size = AVL.Node._get_size(self.left)
-            self.right_size = AVL.Node._get_size(self.right)
+            self.left_size = self.left.size if self.left else 0
+            self.right_size = self.right.size if self.right else 0
             self.height = 1 + max(
                 AVL.Node._get_height(self.left), AVL.Node._get_height(self.right)
             )
@@ -43,13 +35,13 @@ class AVL:
             balance = self.balance
 
             if balance > 1:
-                if AVL.Node._get_balance(self.left) >= 0:  # Left Left Case
+                if self.left and self.left.balance >= 0:  # Left Left Case
                     return self._rotate_right()
                 else:  # Left Right Case
                     self.left = self.left._rotate_left()
                     return self._rotate_right()
             elif balance < -1:
-                if AVL.Node._get_balance(self.right) <= 0:  # Right Right Case
+                if self.right and self.right.balance <= 0:  # Right Right Case
                     return self._rotate_left()
                 else:  # Right Left Case
                     self.right = self.right._rotate_right()
@@ -58,6 +50,7 @@ class AVL:
                 return self
 
         def _rotate_left(self):
+            # TODO: with tuple unpacking
             parent = self.right
             sibling = parent.left
 
@@ -69,6 +62,7 @@ class AVL:
             return parent
 
         def _rotate_right(self):
+            # TODO: with tuple unpacking
             parent = self.left
             sibling = parent.right
 
