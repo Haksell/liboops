@@ -12,38 +12,31 @@ class AVLMultiSet:
         def __init__(self, key):
             self.key = key
             self.height = 1
-            self.count = 1
+            self.freq = 1
             self.left = self.right = None
             self.left_len = self.right_len = 0
 
         def __len__(self):
-            return self.left_len + self.count + self.right_len
+            return self.left_len + self.freq + self.right_len
 
         def __iter__(self):
             if self.left:
                 yield from self.left
-            for _ in range(self.count):
+            for _ in range(self.freq):
                 yield self.key
             if self.right:
                 yield from self.right
 
-        def unique(self):
-            if self.left:
-                yield from self.left.unique()
-            yield self.key
-            if self.right:
-                yield from self.right.unique()
-
         def __contains__(self, key):
-            return self._count(key) >= 1
+            return self.count(key) >= 1
 
         def __getitem__(self, idx):
             if idx < self.left_len:
                 return self.left[idx]
-            elif idx < self.left_len + self.count:
+            elif idx < self.left_len + self.freq:
                 return self.key
             else:
-                return self.right[idx - self.left_len - self.count]
+                return self.right[idx - self.left_len - self.freq]
 
         @property
         def left_height(self):
@@ -57,48 +50,55 @@ class AVLMultiSet:
         def balance(self):
             return self.left_height - self.right_height
 
-        def _update(self):
+        def update_and_balance(self):
+            self.__update()
+            balance = self.balance
+            if balance > 1:
+                if self.left and self.left.balance >= 0:  # Left Left
+                    return self.__rotate_right()
+                else:  # Left Right
+                    self.left = self.left.__rotate_left()
+                    return self.__rotate_right()
+            elif balance < -1:
+                if self.right and self.right.balance <= 0:  # Right Right
+                    return self.__rotate_left()
+                else:  # Right Left
+                    self.right = self.right.__rotate_right()
+                    return self.__rotate_left()
+            else:
+                return self
+
+        def __update(self):
             self.left_len = len(self.left) if self.left else 0
             self.right_len = len(self.right) if self.right else 0
             self.height = 1 + max(self.left_height, self.right_height)
 
-        def _update_and_balance(self):
-            self._update()
-            balance = self.balance
-            if balance > 1:
-                if self.left and self.left.balance >= 0:  # Left Left
-                    return self._rotate_right()
-                else:  # Left Right
-                    self.left = self.left._rotate_left()
-                    return self._rotate_right()
-            elif balance < -1:
-                if self.right and self.right.balance <= 0:  # Right Right
-                    return self._rotate_left()
-                else:  # Right Left
-                    self.right = self.right._rotate_right()
-                    return self._rotate_left()
-            else:
-                return self
-
-        def _rotate_left(self):
+        def __rotate_left(self):
             parent, self.right.left, self.right = self.right, self, self.right.left
-            self._update()
-            parent._update()
+            self.__update()
+            parent.__update()
             return parent
 
-        def _rotate_right(self):
+        def __rotate_right(self):
             parent, self.left.right, self.left = self.left, self, self.left.right
-            self._update()
-            parent._update()
+            self.__update()
+            parent.__update()
             return parent
 
-        def _count(self, key):
+        def count(self, key):
             if key < self.key:
-                return self.left._count(key) if self.left else 0
+                return self.left.count(key) if self.left else 0
             elif key > self.key:
-                return self.right._count(key) if self.right else 0
+                return self.right.count(key) if self.right else 0
             else:
-                return self.count
+                return self.freq
+
+        def unique(self):
+            if self.left:
+                yield from self.left.unique()
+            yield self.key
+            if self.right:
+                yield from self.right.unique()
 
     def __init__(self):
         self.root = None
@@ -117,11 +117,6 @@ class AVLMultiSet:
             return
         yield from self.root
 
-    def unique(self):
-        if self.root is None:
-            return
-        yield from self.root.unique()
-
     def __getitem__(self, idx):
         if idx >= len(self) or idx < -len(self):
             raise IndexError(f"{self.__class__.__name__} index out of range")
@@ -133,7 +128,7 @@ class AVLMultiSet:
                 inorder(node.left, depth + 1)
                 + [
                     "  " * depth
-                    + f"{node.key}: {node.left_len} < {node.count} > {node.right_len}"
+                    + f"{node.key}: {node.left_len} < {node.freq} > {node.right_len}"
                 ]
                 + inorder(node.right, depth + 1)
                 if node
@@ -153,13 +148,13 @@ class AVLMultiSet:
         if node is None:
             return self.Node(key)
         if key == node.key:
-            node.count += 1
+            node.freq += 1
             return node
         if key < node.key:
             node.left = self.__insert(node.left, key)
         else:
             node.right = self.__insert(node.right, key)
-        return node._update_and_balance()
+        return node.update_and_balance()
 
     def delete(self, key):
         self.root = self.__delete(self.root, key)
@@ -171,8 +166,8 @@ class AVLMultiSet:
             node.left = self.__delete(node.left, key)
         elif key > node.key:
             node.right = self.__delete(node.right, key)
-        elif node.count > 1:
-            node.count -= 1
+        elif node.freq > 1:
+            node.freq -= 1
             return node
         elif node.left is None:
             return node.right
@@ -183,13 +178,18 @@ class AVLMultiSet:
             while successor.left is not None:
                 successor = successor.left
             node.key = successor.key
-            node.count = successor.count
-            successor.count = 1  # reset successor count to 1 to delete it
+            node.freq = successor.freq
+            successor.freq = 1  # reset successor count to 1 to delete it
             node.right = self.__delete(node.right, successor.key)
-        return node._update_and_balance()
+        return node.update_and_balance()
 
     def count(self, key):
-        return self.root._count(key) if self.root else 0
+        return self.root.count(key) if self.root else 0
+
+    def unique(self):
+        if self.root is None:
+            return
+        yield from self.root.unique()
 
     def smaller_than(self, key):
         res = 0
@@ -198,7 +198,7 @@ class AVLMultiSet:
             if node.key >= key:
                 node = node.left
             else:
-                res += node.count + node.left_len
+                res += node.freq + node.left_len
                 node = node.right
         return res
 
@@ -223,7 +223,7 @@ def test_avl_multiset(repeats):
             if node is None:
                 return
             fill(node.left)
-            avl_cnt[node.key] = node.count
+            avl_cnt[node.key] = node.freq
             fill(node.right)
 
         avl_cnt = Counter()
