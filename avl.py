@@ -33,7 +33,6 @@ class AVL:
 
         def _update_and_balance(self):
             self._update()
-
             balance = self.balance
 
             if balance > 1:
@@ -110,12 +109,10 @@ class AVL:
         if key == node.key:
             node.count += 1
             return node
-
         if key < node.key:
             node.left = self.__insert(node.left, key)
         else:
             node.right = self.__insert(node.right, key)
-
         return node._update_and_balance()
 
     def delete(self, key):
@@ -145,9 +142,6 @@ class AVL:
             # TODO: no recursive call, just remember parent
             tmp.count = 1  # reset tmp count to 1 to delete it ???
             node.right = self.__delete(node.right, tmp.key)
-            if node is None:
-                return None
-
         return node._update_and_balance()
 
 
