@@ -201,18 +201,22 @@ def test_avl_multiset(repeats):
     lo, hi = sorted(random.choices(range(-100, 101), k=2))
     cnt = Counter()
     avl = AVLMultiSet()
-    for _ in range(100):
+    for _ in range(random.randrange(100)):
         if cnt and random.random() < 0.4:
             key = random.choice(list(cnt.keys()))
-            avl.delete(key)
-            if cnt[key] == 1:
+            deletions = random.randint(1, cnt[key])
+            for _ in range(deletions):
+                avl.delete(key)
+            if cnt[key] == deletions:
                 del cnt[key]
             else:
-                cnt[key] -= 1
+                cnt[key] -= deletions
         else:
             key = random.randint(lo, hi)
-            avl.insert(key)
-            cnt[key] += 1
+            insertions = random.randint(1, 3)
+            for _ in range(insertions):
+                avl.insert(key)
+            cnt[key] += insertions
         assert is_sorted(avl.root)
         assert is_balanced(avl.root)
         assert matches(avl.root, cnt)
