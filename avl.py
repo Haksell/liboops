@@ -85,6 +85,25 @@ class AVL:
         root = self.root
         return root.left_count + root.count + root.right_count if root else 0
 
+    def __repr__(self):
+        def inorder(node, depth):
+            return (
+                inorder(node.left, depth + 1)
+                + [
+                    "  " * depth
+                    + f"{node.key}: {node.left_count} < {node.count} > {node.right_count}"
+                ]
+                + inorder(node.right, depth + 1)
+                if node
+                else []
+            )
+
+        return (
+            "\n".join(inorder(self.root, 0))
+            if self.root
+            else f"{self.__class__.__name__}()"
+        )
+
     @staticmethod
     def _get_height(node):
         return node.height if node else 0
@@ -146,23 +165,6 @@ class AVL:
 
         return node._update_and_balance()
 
-    @staticmethod
-    def _print_inorder(node, depth):
-        if not node:
-            return
-        AVL._print_inorder(node.left, depth + 1)
-        print(
-            "  " * depth
-            + f"{node.key}: {node.left_count} < {node.count} > {node.right_count}"
-        )
-        AVL._print_inorder(node.right, depth + 1)
-
-    def print_inorder(self):
-        if self.root:
-            AVL._print_inorder(self.root, 0)
-        else:
-            print(f"{self.__class__.__name__}()")
-
 
 if __name__ == "__main__":
     avl_tree = AVL()
@@ -171,9 +173,9 @@ if __name__ == "__main__":
         avl_tree.insert(num)
 
     print("Inorder traversal after insertions:")
-    avl_tree.print_inorder()
+    print(avl_tree)
 
     for dk in [20, 30, 10, 20, 20]:
         avl_tree.delete(dk)
         print(f"\nInorder traversal after deleting {dk}:")
-        avl_tree.print_inorder()
+        print(avl_tree)
