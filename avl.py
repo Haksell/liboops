@@ -58,38 +58,38 @@ class AVL:
                 return self
 
         def _rotate_left(self):
-            y = self.right
-            x = y.left
+            parent = self.right
+            sibling = parent.left
 
-            y.left = self
-            self.right = x
+            parent.left = self
+            self.right = sibling
 
             self.left_size = AVL.Node._get_size(self.left)
             self.right_size = AVL.Node._get_size(self.right)
-            y.left_size = AVL.Node._get_size(y.left)
-            y.right_size = AVL.Node._get_size(y.right)
+            parent.left_size = AVL.Node._get_size(parent.left)
+            parent.right_size = AVL.Node._get_size(parent.right)
 
             self._update_height()
-            y._update_height()
+            parent._update_height()
 
-            return y
+            return parent
 
         def _rotate_right(self):
-            x = self.left
-            z = x.right
+            parent = self.left
+            sibling = parent.right
 
-            x.right = self
-            self.left = z
+            parent.right = self
+            self.left = sibling
 
             self.left_size = AVL.Node._get_size(self.left)
             self.right_size = AVL.Node._get_size(self.right)
-            x.left_size = AVL.Node._get_size(x.left)
-            x.right_size = AVL.Node._get_size(x.right)
+            parent.left_size = AVL.Node._get_size(parent.left)
+            parent.right_size = AVL.Node._get_size(parent.right)
 
             self._update_height()
-            x._update_height()
+            parent._update_height()
 
-            return x
+            return parent
 
     def __init__(self):
         self.root = None
