@@ -1,6 +1,9 @@
 # TODO: separate AVLMultiSet, AVLSet and AVLMap
 
 
+from collections import Counter
+
+
 class AVLMultiSet:
     class Node:
         def __init__(self, key):
@@ -8,11 +11,18 @@ class AVLMultiSet:
             self.height = 1
             self.count = 1
             self.left = self.right = None
-            self.left_size = self.right_size = 0
+            self.left_len = self.right_len = 0
 
-        @property
-        def size(self):
-            return self.left_size + self.count + self.right_size
+        def __len__(self):
+            return self.left_len + self.count + self.right_len
+
+        def __contains__(self, key):
+            if key < self.key:
+                return key in self.left if self.left else False
+            elif key > self.key:
+                return key in self.right if self.right else False
+            else:
+                return True
 
         @property
         def left_height(self):
@@ -27,14 +37,13 @@ class AVLMultiSet:
             return self.left_height - self.right_height
 
         def _update(self):
-            self.left_size = self.left.size if self.left else 0
-            self.right_size = self.right.size if self.right else 0
+            self.left_len = len(self.left) if self.left else 0
+            self.right_len = len(self.right) if self.right else 0
             self.height = 1 + max(self.left_height, self.right_height)
 
         def _update_and_balance(self):
             self._update()
             balance = self.balance
-
             if balance > 1:
                 if self.left and self.left.balance >= 0:  # Left Left
                     return self._rotate_right()
@@ -66,10 +75,8 @@ class AVLMultiSet:
             # TODO: with tuple unpacking
             parent = self.left
             sibling = parent.right
-
             parent.right = self
             self.left = sibling
-
             self._update()
             parent._update()
             return parent
@@ -78,8 +85,10 @@ class AVLMultiSet:
         self.root = None
 
     def __len__(self):
-        root = self.root
-        return root.left_size + root.count + root.right_size if root else 0
+        return len(self.root) if self.root else 0
+
+    def __contains__(self, key):
+        return key in self.root if self.root else False
 
     def __repr__(self):
         def inorder(node, depth):
@@ -87,7 +96,7 @@ class AVLMultiSet:
                 inorder(node.left, depth + 1)
                 + [
                     "  " * depth
-                    + f"{node.key}: {node.left_size} < {node.count} > {node.right_size}"
+                    + f"{node.key}: {node.left_len} < {node.count} > {node.right_len}"
                 ]
                 + inorder(node.right, depth + 1)
                 if node
@@ -244,11 +253,22 @@ def test_avl_complex_operations():
     assert avl.root.balance in [-1, 0, 1]
 
 
+def test_avl_multiset():
+    for _ in range(100):
+        keys = []
+        cnt = Counter()
+        avl = AVLMultiSet()
+        # for _ in range(100):
+        #     if
+
+
 if __name__ == "__main__":
     avl = AVLMultiSet()
+    print(bool(avl))
     data = [10, 20, 20, 30, 40, 50, 25, 20]
     for num in data:
         avl.insert(num)
+    print(bool(avl))
 
     print("Inorder traversal after insertions:")
     print(avl)
