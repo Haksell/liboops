@@ -31,23 +31,12 @@ class AVLMultiSet:
             return self._count(key) >= 1
 
         def __getitem__(self, idx):
-            return self._getitem_left(idx) if idx >= 0 else self._getitem_right(~idx)
-
-        def _getitem_left(self, idx):
             if idx < self.left_len:
-                return self.left._getitem_left(idx)
+                return self.left[idx]
             elif idx < self.left_len + self.count:
                 return self.key
             else:
-                return self.right._getitem_left(idx - self.left_len - self.count)
-
-        def _getitem_right(self, idx):
-            if idx < self.right_len:
-                return self.right._getitem_right(idx)
-            elif idx < self.right_len + self.count:
-                return self.key
-            else:
-                return self.left._getitem_right(idx - self.right_len - self.count)
+                return self.right[idx - self.left_len - self.count]
 
         @property
         def left_height(self):
@@ -124,7 +113,7 @@ class AVLMultiSet:
     def __getitem__(self, idx):
         if idx >= len(self) or idx < -len(self):
             raise IndexError(f"{self.__class__.__name__} index out of range")
-        return self.root[idx]
+        return self.root[idx] if idx >= 0 else self.root[idx + len(self.root)]
 
     def __repr__(self):
         def inorder(node, depth):
