@@ -30,15 +30,15 @@ class AVL:
         def _get_balance(node):
             return node.balance if node else 0
 
-        def _update_height(self):
+        def _update(self):
+            self.left_size = AVL.Node._get_size(self.left)
+            self.right_size = AVL.Node._get_size(self.right)
             self.height = 1 + max(
                 AVL.Node._get_height(self.left), AVL.Node._get_height(self.right)
             )
 
         def _update_and_balance(self):
-            self.left_size = AVL.Node._get_size(self.left)
-            self.right_size = AVL.Node._get_size(self.right)
-            self._update_height()
+            self._update()
 
             balance = self.balance
 
@@ -64,14 +64,8 @@ class AVL:
             parent.left = self
             self.right = sibling
 
-            self.left_size = AVL.Node._get_size(self.left)
-            self.right_size = AVL.Node._get_size(self.right)
-            parent.left_size = AVL.Node._get_size(parent.left)
-            parent.right_size = AVL.Node._get_size(parent.right)
-
-            self._update_height()
-            parent._update_height()
-
+            self._update()
+            parent._update()
             return parent
 
         def _rotate_right(self):
@@ -81,14 +75,8 @@ class AVL:
             parent.right = self
             self.left = sibling
 
-            self.left_size = AVL.Node._get_size(self.left)
-            self.right_size = AVL.Node._get_size(self.right)
-            parent.left_size = AVL.Node._get_size(parent.left)
-            parent.right_size = AVL.Node._get_size(parent.right)
-
-            self._update_height()
-            parent._update_height()
-
+            self._update()
+            parent._update()
             return parent
 
     def __init__(self):
