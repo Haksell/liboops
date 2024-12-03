@@ -71,23 +71,13 @@ class AVLMultiSet:
                 return self
 
         def _rotate_left(self):
-            # TODO: with tuple unpacking
-            parent = self.right
-            sibling = parent.left
-
-            parent.left = self
-            self.right = sibling
-
+            parent, self.right.left, self.right = self.right, self, self.right.left
             self._update()
             parent._update()
             return parent
 
         def _rotate_right(self):
-            # TODO: with tuple unpacking
-            parent = self.left
-            sibling = parent.right
-            parent.right = self
-            self.left = sibling
+            parent, self.left.right, self.left = self.left, self, self.left.right
             self._update()
             parent._update()
             return parent
