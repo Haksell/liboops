@@ -10,12 +10,73 @@ class AVL:
             self.left = self.right = None
             self.left_count = self.right_count = 0
 
-        def update(self):
+        def _update_and_balance(self):
             self.left_count = AVL._get_size(self.left)
             self.right_count = AVL._get_size(self.right)
             self.height = 1 + max(
                 AVL._get_height(self.left), AVL._get_height(self.right)
             )
+
+            balance = AVL._get_balance(self)
+            balance_left = AVL._get_balance(self.left)
+            balance_right = AVL._get_balance(self.right)
+
+            if balance > 1:
+                # Left Left Case
+                if balance_left >= 0:
+                    return self.AVL._rotate_right()
+                # Left Right Case
+                else:
+                    self.left = self.left._rotate_left()
+                    return self.AVL._rotate_right()
+            elif balance < -1:
+                # Right Right Case
+                if balance_right <= 0:
+                    return self._rotate_left()
+                # Right Left Case
+                else:
+                    self.right = self.right._rotate_right()
+                    return self._rotate_left()
+
+            return self
+
+        def _rotate_left(self):
+            y = self.right
+            x = y.left
+
+            y.left = self
+            self.right = x
+
+            self.left_count = AVL._get_size(self.left)
+            self.right_count = AVL._get_size(self.right)
+            y.left_count = AVL._get_size(y.left)
+            y.right_count = AVL._get_size(y.right)
+
+            self.height = 1 + max(
+                AVL._get_height(self.left), AVL._get_height(self.right)
+            )
+            y.height = 1 + max(AVL._get_height(y.left), AVL._get_height(y.right))
+
+            return y
+
+        def _rotate_right(self):
+            x = self.left
+            z = x.right
+
+            x.right = self
+            self.left = z
+
+            self.left_count = AVL._get_size(self.left)
+            self.right_count = AVL._get_size(self.right)
+            x.left_count = AVL._get_size(x.left)
+            x.right_count = AVL._get_size(x.right)
+
+            self.height = 1 + max(
+                AVL._get_height(self.left), AVL._get_height(self.right)
+            )
+            x.height = 1 + max(AVL._get_height(x.left), AVL._get_height(x.right))
+
+            return x
 
     def __init__(self):
         self.root = None
@@ -51,7 +112,7 @@ class AVL:
         else:
             node.right = self.__insert(node.right, key)
 
-        return self.__update_and_balance(node)
+        return node._update_and_balance()
 
     def delete(self, key):
         self.root = self.__delete(self.root, key)
@@ -83,76 +144,22 @@ class AVL:
             if node is None:
                 return None
 
-        return self.__update_and_balance(node)
+        return node._update_and_balance()
 
-    def __update_and_balance(self, node):
-        node.update()
-        balance = AVL._get_balance(node)
-
-        # Left Left Case
-        if balance > 1 and AVL._get_balance(node.left) >= 0:
-            return self.__rotate_right(node)
-        # Left Right Case
-        if balance > 1 and AVL._get_balance(node.left) < 0:
-            node.left = self.__rotate_left(node.left)
-            return self.__rotate_right(node)
-        # Right Left Case
-        if balance < -1 and AVL._get_balance(node.right) > 0:
-            node.right = self.__rotate_right(node.right)
-            return self.__rotate_left(node)
-        # Right Right Case
-        if balance < -1 and AVL._get_balance(node.right) <= 0:
-            return self.__rotate_left(node)
-
-        return node
-
-    def __rotate_left(self, z):
-        y = z.right
-        x = y.left
-
-        y.left = z
-        z.right = x
-
-        z.left_count = AVL._get_size(z.left)
-        z.right_count = AVL._get_size(z.right)
-        y.left_count = AVL._get_size(y.left)
-        y.right_count = AVL._get_size(y.right)
-
-        z.height = 1 + max(AVL._get_height(z.left), AVL._get_height(z.right))
-        y.height = 1 + max(AVL._get_height(y.left), AVL._get_height(y.right))
-
-        return y
-
-    def __rotate_right(self, y):
-        x = y.left
-        z = x.right
-
-        x.right = y
-        y.left = z
-
-        y.left_count = AVL._get_size(y.left)
-        y.right_count = AVL._get_size(y.right)
-        x.left_count = AVL._get_size(x.left)
-        x.right_count = AVL._get_size(x.right)
-
-        y.height = 1 + max(AVL._get_height(y.left), AVL._get_height(y.right))
-        x.height = 1 + max(AVL._get_height(x.left), AVL._get_height(x.right))
-
-        return x
-
-    def __print_inorder(self, node, depth):
+    @staticmethod
+    def _print_inorder(node, depth):
         if not node:
             return
-        self.__print_inorder(node.left, depth + 1)
+        AVL._print_inorder(node.left, depth + 1)
         print(
             "  " * depth
             + f"{node.key}: {node.left_count} < {node.count} > {node.right_count}"
         )
-        self.__print_inorder(node.right, depth + 1)
+        AVL._print_inorder(node.right, depth + 1)
 
     def print_inorder(self):
         if self.root:
-            self.__print_inorder(self.root, 0)
+            AVL._print_inorder(self.root, 0)
         else:
             print(f"{self.__class__.__name__}()")
 
