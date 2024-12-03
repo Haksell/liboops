@@ -10,6 +10,9 @@ class SegmentTree:
     def __len__(self):
         return self.__n
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.__tree[self.__n:]})"
+
     def __getitem__(self, i):
         return self.__tree[i + self.__n]
 
