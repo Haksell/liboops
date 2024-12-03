@@ -12,12 +12,15 @@ class UnionFind:
 
     def __repr__(self):
         components = (
-            str(list(self.components()))
-            .replace(",", "")
-            .replace("[", "{")
-            .replace("]", "}")
+            str(list(self)).replace(",", "").replace("[", "{").replace("]", "}")
         )[1:-1]
         return f"{self.__class__.__name__}({components})"
+
+    def __iter__(self):
+        components = defaultdict(list)
+        for i in range(self.__len):
+            components[self.find(i)].append(i)
+        yield from components.values()
 
     def find(self, u):
         while u != self.__parents[u]:
@@ -40,9 +43,3 @@ class UnionFind:
 
     def connected(self, u, v):
         return self.find(u) == self.find(v)
-
-    def components(self):
-        components = defaultdict(list)
-        for i in range(self.__len):
-            components[self.find(i)].append(i)
-        yield from components.values()
