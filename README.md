@@ -27,4 +27,4 @@
 - [ ] https://github.com/kth-competitive-programming/kactl
 - [ ] https://github.com/TheAlgorithms/Python
 - [ ] https://github.com/cheran-senthil/PyRival
-- [ ] whatever is needed to solve codeforces problems
+- [ ] Whatever is needed to solve codeforces problems
