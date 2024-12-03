@@ -10,24 +10,26 @@ class AVL:
             self.left = self.right = None
             self.left_size = self.right_size = 0
 
-        @staticmethod
-        def _get_height(node):
-            return node.height if node else 0
-
         @property
         def size(self):
             return self.left_size + self.count + self.right_size
 
         @property
+        def left_height(self):
+            return self.left.height if self.left else 0
+
+        @property
+        def right_height(self):
+            return self.right.height if self.right else 0
+
+        @property
         def balance(self):
-            return AVL.Node._get_height(self.left) - AVL.Node._get_height(self.right)
+            return self.left_height - self.right_height
 
         def _update(self):
             self.left_size = self.left.size if self.left else 0
             self.right_size = self.right.size if self.right else 0
-            self.height = 1 + max(
-                AVL.Node._get_height(self.left), AVL.Node._get_height(self.right)
-            )
+            self.height = 1 + max(self.left_height, self.right_height)
 
         def _update_and_balance(self):
             self._update()
@@ -35,15 +37,15 @@ class AVL:
             balance = self.balance
 
             if balance > 1:
-                if self.left and self.left.balance >= 0:  # Left Left Case
+                if self.left and self.left.balance >= 0:  # Left Left
                     return self._rotate_right()
-                else:  # Left Right Case
+                else:  # Left Right
                     self.left = self.left._rotate_left()
                     return self._rotate_right()
             elif balance < -1:
-                if self.right and self.right.balance <= 0:  # Right Right Case
+                if self.right and self.right.balance <= 0:  # Right Right
                     return self._rotate_left()
-                else:  # Right Left Case
+                else:  # Right Left
                     self.right = self.right._rotate_right()
                     return self._rotate_left()
             else:
