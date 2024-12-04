@@ -50,6 +50,28 @@ class AVLMultiSet:
         def balance(self):
             return self.left_height - self.right_height
 
+        def delete(self, key):
+            if key < self.key:
+                self.left = self.left.delete(key)
+            elif key > self.key:
+                self.right = self.right.delete(key)
+            elif self.freq > 1:
+                self.freq -= 1
+                return self
+            elif self.left is None:
+                return self.right
+            elif self.right is None:
+                return self.left
+            else:
+                successor = self.right
+                while successor.left is not None:
+                    successor = successor.left
+                self.key = successor.key
+                self.freq = successor.freq
+                successor.freq = 1  # reset successor count to 1 to delete it
+                self.right = self.right.delete(successor.key)
+            return self.update_and_balance()
+
         def update_and_balance(self):
             self.__update()
             balance = self.balance
@@ -146,7 +168,7 @@ class AVLMultiSet:
 
     def __insert(self, node, key):
         if node is None:
-            return self.Node(key)
+            return AVLMultiSet.Node(key)
         if key == node.key:
             node.freq += 1
             return node
@@ -157,31 +179,7 @@ class AVLMultiSet:
         return node.update_and_balance()
 
     def delete(self, key):
-        self.root = self.__delete(self.root, key)
-
-    def __delete(self, node, key):
-        if node is None:
-            return None
-        if key < node.key:
-            node.left = self.__delete(node.left, key)
-        elif key > node.key:
-            node.right = self.__delete(node.right, key)
-        elif node.freq > 1:
-            node.freq -= 1
-            return node
-        elif node.left is None:
-            return node.right
-        elif node.right is None:
-            return node.left
-        else:
-            successor = node.right
-            while successor.left is not None:
-                successor = successor.left
-            node.key = successor.key
-            node.freq = successor.freq
-            successor.freq = 1  # reset successor count to 1 to delete it
-            node.right = self.__delete(node.right, successor.key)
-        return node.update_and_balance()
+        self.root = self.root and self.root.delete(key)
 
     def count(self, key):
         return self.root.count(key) if self.root else 0
