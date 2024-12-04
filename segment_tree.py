@@ -37,3 +37,6 @@ class SegmentTree:
             left >>= 1
             right >>= 1
         return res
+
+    def sum(self):
+        return 0 if self.__n == 0 else self.__tree[1]
