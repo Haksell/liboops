@@ -50,6 +50,22 @@ class AVLMultiSet:
         def balance(self):
             return self.left_height - self.right_height
 
+        def insert(self, key):
+            if self is None:
+                return AVLMultiSet.Node(key)
+            if key == self.key:
+                self.freq += 1
+                return self
+            if key < self.key:
+                self.left = (
+                    self.left.insert(key) if self.left else AVLMultiSet.Node(key)
+                )
+            else:
+                self.right = (
+                    self.right.insert(key) if self.right else AVLMultiSet.Node(key)
+                )
+            return self.__update_and_balance()
+
         def delete(self, key):
             if key < self.key:
                 self.left = self.left.delete(key)
@@ -70,22 +86,6 @@ class AVLMultiSet:
                 self.freq = successor.freq
                 successor.freq = 1  # reset successor count to 1 to delete it
                 self.right = self.right.delete(successor.key)
-            return self.__update_and_balance()
-
-        def insert(self, key):
-            if self is None:
-                return AVLMultiSet.Node(key)
-            if key == self.key:
-                self.freq += 1
-                return self
-            if key < self.key:
-                self.left = (
-                    self.left.insert(key) if self.left else AVLMultiSet.Node(key)
-                )
-            else:
-                self.right = (
-                    self.right.insert(key) if self.right else AVLMultiSet.Node(key)
-                )
             return self.__update_and_balance()
 
         def __update_and_balance(self):
