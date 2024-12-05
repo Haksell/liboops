@@ -17,6 +17,9 @@ class FenwickTree:
                 instance.__tree[j] += instance.__tree[i]
         return instance
 
+    def __len__(self):
+        return self.__len
+
     def update(self, i, delta):
         i += 1
         while i <= self.__len:
@@ -45,6 +48,7 @@ def test_fenwick_tree(repeats):
     else:
         a = [0] * n
         fenwick_tree = FenwickTree(n)
+    assert len(fenwick_tree) == n
     for _ in range(random.randrange(100)):
         i = random.randrange(n)
         delta = random.randint(-100, 100)
