@@ -3,14 +3,19 @@ import pytest
 
 
 class FenwickTree:
-    def __init__(self, data):
-        self.__len = len(data)
-        self.__tree = [0] * (self.__len + 1)
+    def __init__(self, size):
+        self.__len = size
+        self.__tree = [0] * (size + 1)
+
+    @staticmethod
+    def from_list(data):
+        instance = FenwickTree(len(data))
         for i, n in enumerate(data, 1):
-            self.__tree[i] += n
+            instance.__tree[i] += n
             j = i + (i & -i)
-            if j <= self.__len:
-                self.__tree[j] += self.__tree[i]
+            if j <= instance.__len:
+                instance.__tree[j] += instance.__tree[i]
+        return instance
 
     def update(self, i, delta):
         i += 1
@@ -34,8 +39,12 @@ class FenwickTree:
 @pytest.mark.parametrize("repeats", range(100))
 def test_fenwick_tree(repeats):
     n = random.randint(1, 100)
-    a = [random.randint(-100, 100) for _ in range(n)]
-    fenwick_tree = FenwickTree(a)
+    if random.random() < 0.5:
+        a = [random.randint(-100, 100) for _ in range(n)]
+        fenwick_tree = FenwickTree.from_list(a)
+    else:
+        a = [0] * n
+        fenwick_tree = FenwickTree(n)
     for _ in range(random.randrange(100)):
         i = random.randrange(n)
         delta = random.randint(-100, 100)
