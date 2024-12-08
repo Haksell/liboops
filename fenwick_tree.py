@@ -50,8 +50,7 @@ class FenwickTree:
     def range_sum(self, left, right):
         return self.prefix_sum(right) - self.prefix_sum(left)
 
-    def nth(self, nth):
-        # requires all elements to be nonnegative
+    def nth(self, nth):  # requires all elements to be nonnegative
         if nth < 0 or nth >= self.__sum:
             return None
         i = self.__mid
