@@ -33,11 +33,9 @@ class UnionFind:
             return
         if self.__ranks[root_u] > self.__ranks[root_v]:
             self.__parents[root_v] = root_u
-        elif self.__ranks[root_v] > self.__ranks[root_u]:
-            self.__parents[root_u] = root_v
         else:
             self.__parents[root_u] = root_v
-            self.__ranks[root_v] += 1
+            self.__ranks[root_v] += self.__ranks[root_v] == self.__ranks[root_u]
 
     def connected(self, u, v):
         return self.find(u) == self.find(v)
