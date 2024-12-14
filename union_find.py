@@ -24,8 +24,7 @@ class UnionFind:
 
     def find(self, u):
         while u != self.__parents[u]:
-            self.__parents[u] = self.__parents[self.__parents[u]]
-            u = self.__parents[u]
+            u = self.__parents[u] = self.__parents[self.__parents[u]]
         return u
 
     def union(self, u, v):
