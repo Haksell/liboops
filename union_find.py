@@ -2,7 +2,7 @@ from collections import defaultdict
 
 
 class UnionFind:
-    def __init__(self, n):
+    def __init__(self, n=0):
         self.__len = n
         self.__parents = list(range(n))
         self.__ranks = [1] * n
@@ -43,3 +43,10 @@ class UnionFind:
 
     def connected(self, u, v):
         return self.find(u) == self.find(v)
+
+    def add(self):
+        n = self.__len
+        self.__parents.append(n)
+        self.__ranks.append(1)
+        self.__len += 1
+        return n
