@@ -1,8 +1,6 @@
 # TODO
 
 - [ ] Test existing classes
-- [ ] FenwickTree (repush `2046C` with it)
-- [ ] SegmentTree with func argument
 - [ ] `@abc AVL`, with `AVLMultiSet`, `AvlSet`, `AvlDict`
 - [ ] Wrapper around `heapq` to work as a max-heap
 - [ ] Wrappers around `set`, `dict`, `defaultdict` and `Counter` to avoid hash collisions
@@ -28,3 +26,4 @@
 - [ ] https://github.com/TheAlgorithms/Python
 - [ ] https://github.com/cheran-senthil/PyRival
 - [ ] Whatever is needed to solve codeforces problems
+- [ ] CartesianTree (then solve 2048F)
