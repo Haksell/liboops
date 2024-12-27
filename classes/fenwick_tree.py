@@ -1,3 +1,4 @@
+from itertools import count
 import random
 import pytest
 
@@ -50,7 +51,9 @@ class FenwickTree:
     def range_sum(self, left, right):
         return self.prefix_sum(right) - self.prefix_sum(left)
 
-    def nth(self, nth):  # requires all elements to be nonnegative
+    # Following methods require all elements to be nonnegative
+
+    def nth(self, nth):
         if nth < 0 or nth >= self.__sum:
             return None
         i = self.__mid
@@ -61,6 +64,22 @@ class FenwickTree:
                 i -= shift
             else:
                 nth -= self.__tree[i]
+                res = i
+                i += shift
+            if shift == 0:
+                return res
+            shift >>= 1
+
+    def h_index(self):
+        i = self.__mid
+        shift = i >> 1
+        res = 0
+        bigger = self.__sum
+        while True:
+            if i > self.__len or bigger - self.__tree[i] < i:
+                i -= shift
+            else:
+                bigger -= self.__tree[i]
                 res = i
                 i += shift
             if shift == 0:
@@ -112,3 +131,37 @@ def test_fenwick_tree_nth(repeats):
     assert fenwick_tree.nth(s) is None
     for nth in range(s):
         assert fenwick_tree.nth(nth) == naive[nth]
+
+
+@pytest.mark.parametrize("repeats", range(42))
+def test_fenwick_tree_h_index(repeats):
+    def naive_h_index(a):
+        for i in count(1):
+            if sum(x >= i for x in a) < i:
+                return i - 1
+
+    n = random.randrange(1, 42)
+    a = random.choices(range(n), k=random.randrange(42))
+    fenwick_tree = FenwickTree(n)
+    for x in a:
+        fenwick_tree.update(x, 1)
+    naive_res = naive_h_index(a)
+    builtin_res = fenwick_tree.h_index()
+    assert naive_res == builtin_res, (
+        a,
+        naive_res,
+        builtin_res,
+        (0, len(fenwick_tree) + 1),
+        [(i, fenwick_tree.suffix_sum(i)) for i in range(n)],
+    )
+
+
+def test_fenwick_tree_h_index_zero():
+    assert FenwickTree(0).h_index() == 0
+    assert FenwickTree(1).h_index() == 0
+    assert FenwickTree(2).h_index() == 0
+    assert FenwickTree(3).h_index() == 0
+    assert FenwickTree.from_list([]).h_index() == 0
+    assert FenwickTree.from_list([0]).h_index() == 0
+    assert FenwickTree.from_list([0, 0]).h_index() == 0
+    assert FenwickTree.from_list([0, 0, 0]).h_index() == 0
