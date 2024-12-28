@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] CartesianTree (2048F)
+- [ ] `bounded_levenstein(s, t, k)` (abc386_c + abc386_f)
 - [ ] Test existing classes
 - [ ] `@abc AVL`, with `AVLMultiSet`, `AvlSet`, `AvlDict`
 - [ ] Wrapper around `heapq` to work as a max-heap
@@ -26,4 +28,3 @@
 - [ ] https://github.com/TheAlgorithms/Python
 - [ ] https://github.com/cheran-senthil/PyRival
 - [ ] Whatever is needed to solve codeforces problems
-- [ ] CartesianTree (then solve 2048F)
