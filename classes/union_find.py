@@ -3,12 +3,16 @@ from collections import defaultdict
 
 class UnionFind:
     def __init__(self, n=0):
-        self.__len = n
+        self.__len = self.__num_components = n
         self.__parents = list(range(n))
         self.__ranks = [1] * n
 
     def __len__(self):
         return self.__len
+
+    @property
+    def num_components(self):
+        return self.__num_components
 
     def __repr__(self):
         components = (
@@ -32,6 +36,7 @@ class UnionFind:
         root_u, root_v = self.find(u), self.find(v)
         if root_u == root_v:
             return
+        self.__num_components -= 1
         if self.__ranks[root_u] > self.__ranks[root_v]:
             self.__parents[root_v] = root_u
         else:
@@ -46,4 +51,5 @@ class UnionFind:
         self.__parents.append(n)
         self.__ranks.append(1)
         self.__len += 1
+        self.__num_components += 1
         return n
